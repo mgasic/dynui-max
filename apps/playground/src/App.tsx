@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import type { ChangeEvent } from 'react';
 import {
   ThemeProvider,
   useTheme,
@@ -106,8 +105,8 @@ function PlaygroundContent() {
 
   type SelectChangeValue = Parameters<NonNullable<DynSelectProps['onChange']>>[0];
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
   };
 
   const handleFrameworkChange = (value: SelectChangeValue) => {
