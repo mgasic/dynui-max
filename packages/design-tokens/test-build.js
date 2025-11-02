@@ -46,21 +46,36 @@ buildProcess.on('close', (code) => {
     console.log('✅ Style Dictionary build successful!');
     
     // Check generated files
-    const cssFile = join(__dirname, 'dist', 'tokens.css');
-    const jsFile = join(__dirname, 'dist', 'tokens.js');
-    
-    if (existsSync(cssFile)) {
-      console.log('✅ CSS tokens generated');
-    } else {
-      console.log('⚠️  CSS tokens not found');
+    const artifactChecks = [
+      { label: 'CSS tokens', path: join(__dirname, 'dist', 'tokens.css') },
+      { label: 'JS tokens', path: join(__dirname, 'dist', 'tokens.js') },
+      { label: 'Light theme CSS', path: join(__dirname, 'dist', 'themes', 'light.css') },
+      { label: 'Dark theme CSS', path: join(__dirname, 'dist', 'themes', 'dark.css') }
+    ];
+
+    const artifactStatuses = artifactChecks.map(({ label, path }) => ({
+      label,
+      path,
+      exists: existsSync(path)
+    }));
+
+    const missingArtifacts = artifactStatuses.filter(({ exists }) => !exists);
+
+    if (missingArtifacts.length > 0) {
+      for (const { label, path, exists } of artifactStatuses) {
+        const status = exists ? '✅' : '❌';
+        const message = exists ? `${status} ${label} generated` : `${status} ${label} not found at ${path}`;
+        console[exists ? 'log' : 'error'](message);
+      }
+
+      console.error('❌ Build is missing required artifacts');
+      process.exit(1);
     }
-    
-    if (existsSync(jsFile)) {
-      console.log('✅ JS tokens generated');
-    } else {
-      console.log('⚠️  JS tokens not found');
+
+    for (const { label } of artifactStatuses) {
+      console.log(`✅ ${label} generated`);
     }
-    
+
     console.log('🎉 All tests passed!');
   } else {
     console.error('❌ Style Dictionary build failed');

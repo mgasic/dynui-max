@@ -4,7 +4,7 @@ export const tsupConfig = {
   sourcemap: true,
   clean: true,
   format: ["esm", "cjs"],
-  dts: false,
+  dts: true,
 };
 
 // Example usage in a package tsup.config.ts:

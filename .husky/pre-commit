@@ -6,4 +6,4 @@ fi
 set -e
 pnpm typecheck
 pnpm lint
-pnpm test -- --filter='!@dynui-max/monorepo' -- --run --changed
+pnpm test --run --changed

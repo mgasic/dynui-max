@@ -133,8 +133,8 @@ export const FormExample: Story = {
     <DynBox p="xl" bg="background" radius="lg">
       <h2>Account Setup</h2>
       <DynBox display="flex" direction="column" gap="md">
-        <DynButton variant="primary">Continue with Email</DynButton>
-        <DynButton variant="secondary">Continue with Google</DynButton>
+        <DynButton variant="solid" color="primary">Continue with Email</DynButton>
+        <DynButton variant="solid" color="secondary">Continue with Google</DynButton>
       </DynBox>
       <DynDivider label="OR" spacing="lg" />
       <DynBox display="flex" direction="column" gap="md">

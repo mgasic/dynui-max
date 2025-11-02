@@ -1,25 +1,28 @@
 import { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import {
   ThemeProvider,
   useTheme,
   DynContainer,
   DynBox,
-  DynGrid,
-  DynGridItem,
   DynButton,
   DynInput,
   DynSelect,
   DynTabs,
   DynTable,
   DynTreeView,
-  DynMenu,
   DynBreadcrumb,
   DynBadge,
   DynAvatar,
   DynModal,
   ThemeSwitcher,
   DynIcon,
-  DynFieldContainer
+  DynFieldContainer,
+  type TabItem,
+  type TableColumn,
+  type TreeNode,
+  type SelectOption,
+  type DynSelectProps
 } from '@dynui-max/core';
 
 interface User {
@@ -36,11 +39,11 @@ const sampleUsers: User[] = [
   { key: '3', name: 'Carol Williams', email: 'carol@company.com', role: 'Manager', status: 'inactive' },
 ];
 
-const tableColumns = [
+const tableColumns: TableColumn<User>[] = [
   {
     key: 'user',
     title: 'User',
-    render: (_: any, record: User) => (
+    render: (_: unknown, record: User) => (
       <DynBox display="flex" align="center" gap="sm">
         <DynAvatar name={record.name} size="sm" />
         <div>
@@ -63,7 +66,7 @@ const tableColumns = [
   }
 ];
 
-const treeData = [
+const treeData: TreeNode[] = [
   {
     key: 'components',
     title: 'Components',
@@ -86,7 +89,7 @@ const treeData = [
   }
 ];
 
-const selectOptions = [
+const selectOptions: SelectOption[] = [
   { value: 'react', label: 'React' },
   { value: 'vue', label: 'Vue.js' },
   { value: 'angular', label: 'Angular' },
@@ -101,7 +104,29 @@ function PlaygroundContent() {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
 
-  const tabs = [
+  type SelectChangeValue = Parameters<NonNullable<DynSelectProps['onChange']>>[0];
+
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleFrameworkChange = (value: SelectChangeValue) => {
+    if (Array.isArray(value)) {
+      setSelectedFramework(value[0] ?? '');
+    } else {
+      setSelectedFramework(value);
+    }
+  };
+
+  const handleUserSelectionChange = (keys: string[]) => {
+    setSelectedUsers(keys);
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
+  const tabs: TabItem[] = [
     {
       value: 'overview',
       label: 'Overview',
@@ -109,23 +134,23 @@ function PlaygroundContent() {
         <DynBox p="lg">
           <h2>DynUI-Max Playground</h2>
           <p>Interactive playground for testing all 26 production components in real-time.</p>
-          
+
           <DynBox mt="lg" display="flex" gap="md" direction="column">
             <DynFieldContainer label="Search Components" helpText="Try searching for components or features">
               <DynInput
                 variant="search"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 placeholder="Search components..."
                 clearable
               />
             </DynFieldContainer>
-            
+
             <DynFieldContainer label="Select Framework" required>
               <DynSelect
                 options={selectOptions}
                 value={selectedFramework}
-                onChange={setSelectedFramework}
+                onChange={handleFrameworkChange}
                 placeholder="Choose your framework..."
                 searchable
               />
@@ -142,6 +167,7 @@ function PlaygroundContent() {
               <DynButton
                 variant="outline"
                 onClick={() => alert('Export feature coming soon!')}
+                endIcon={<DynIcon name="arrow-right" size="sm" />}
               >
                 Export Data
               </DynButton>
@@ -170,10 +196,10 @@ function PlaygroundContent() {
             dataSource={sampleUsers}
             rowSelection={{
               selectedRowKeys: selectedUsers,
-              onChange: setSelectedUsers,
+              onChange: handleUserSelectionChange,
               type: 'checkbox'
             }}
-            onRowClick={(user) => alert(`User: ${user.name}`)}
+            onRowClick={(user: User) => alert(`User: ${user.name}`)}
           />
         </DynBox>
       )
@@ -190,7 +216,7 @@ function PlaygroundContent() {
               defaultExpandedKeys={['components']}
               showIcon={true}
               selectionMode="single"
-              onSelect={(keys, nodes) => {
+              onSelect={(_selectedKeys: string[], nodes: TreeNode[]) => {
                 if (nodes.length > 0) {
                   alert(`Selected: ${nodes[0].title}`);
                 }
@@ -233,7 +259,7 @@ function PlaygroundContent() {
       <DynBox mt="lg">
         <DynTabs
           value={activeTab}
-          onChange={setActiveTab}
+          onChange={handleTabChange}
           items={tabs}
         />
       </DynBox>

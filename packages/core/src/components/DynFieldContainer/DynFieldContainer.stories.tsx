@@ -339,7 +339,7 @@ export const ValidationStates: Story = {
           </DynFieldContainer>
           
           <DynBox pt="md">
-            <DynButton type="submit" variant="primary" size="lg">
+            <DynButton type="submit" variant="solid" color="primary" size="lg">
               Create Account
             </DynButton>
           </DynBox>
@@ -471,10 +471,10 @@ export const ComplexForm: Story = {
         {/* Submit Section */}
         <DynBox pt="lg" style={{ borderTop: '1px solid var(--dyn-color-border-primary)' }}>
           <DynBox display="flex" gap="md">
-            <DynButton variant="primary" size="lg">
+            <DynButton variant="solid" color="primary" size="lg">
               Create Account
             </DynButton>
-            <DynButton variant="secondary" size="lg">
+            <DynButton variant="solid" color="secondary" size="lg">
               Cancel
             </DynButton>
           </DynBox>

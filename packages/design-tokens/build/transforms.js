@@ -9,7 +9,7 @@ import StyleDictionary from 'style-dictionary';
 export const dynKebabTransform = {
   name: 'name/cti/dyn-kebab',
   type: 'name',
-  transformer: (token) => {
+  transform: (token) => {
     return `dyn-${token.path.join('-')}`;
   }
 };
@@ -18,12 +18,12 @@ export const dynKebabTransform = {
 export const sizeRemTransform = {
   name: 'size/px-to-rem',
   type: 'value',
-  matcher: (token) => {
-    return token.attributes?.category === 'size' && 
-           typeof token.value === 'string' && 
+  filter: (token) => {
+    return token.attributes?.category === 'size' &&
+           typeof token.value === 'string' &&
            token.value.endsWith('px');
   },
-  transformer: (token) => {
+  transform: (token) => {
     const pxValue = parseFloat(token.value);
     return `${pxValue / 16}rem`;
   }
@@ -33,11 +33,11 @@ export const sizeRemTransform = {
 export const fontFamilyTransform = {
   name: 'font/family/css',
   type: 'value',
-  matcher: (token) => {
-    return token.attributes?.category === 'font' && 
+  filter: (token) => {
+    return token.attributes?.category === 'font' &&
            token.attributes?.type === 'family';
   },
-  transformer: (token) => {
+  transform: (token) => {
     // Font family is already a string in our JSON, just return it
     return token.value;
   }
@@ -57,7 +57,7 @@ export const dynCssTransformGroup = {
     'attribute/cti',          // Built-in: adds category/type/item attributes
     'name/cti/dyn-kebab',     // Custom: dyn- prefixed kebab-case names
     'time/seconds',           // Built-in: converts time to seconds
-    'content/icon',           // Built-in: wraps icon values in quotes
+    'html/icon',              // Built-in: wraps icon values in quotes
     'size/px-to-rem',         // Custom: converts px to rem
     'font/family/css',        // Custom: formats font families
     'color/hex'               // Built-in: ensures colors are hex

@@ -1,6 +1,8 @@
+import packageJson from '../package.json' assert { type: 'json' };
+
 /**
  * DynUI-Max Core Components
- * 
+ *
  * Production-ready React + TypeScript component library
  * with design tokens integration and comprehensive a11y support.
  */
@@ -115,4 +117,4 @@ export type {
 } from '@dynui-max/design-tokens';
 
 // Version
-export const VERSION = '0.2.0';
+export const VERSION = packageJson.version;

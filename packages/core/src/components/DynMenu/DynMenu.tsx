@@ -2,7 +2,6 @@ import React, { forwardRef, useState, useRef, useCallback, useEffect } from 'rea
 import clsx from 'clsx';
 import { DynIcon } from '../DynIcon';
 import { useClickOutside } from '../../hooks/useClickOutside';
-import { useKeyboard } from '../../hooks/useKeyboard';
 import './DynMenu.css';
 
 export interface MenuItem {
@@ -14,6 +13,18 @@ export interface MenuItem {
   description?: string;
 }
 
+export interface DynMenuTriggerRenderProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  ref: React.Ref<HTMLButtonElement>;
+  /**
+   * Indicates whether the menu is currently open
+   */
+  isOpen: boolean;
+}
+
+export type DynMenuTrigger =
+  | React.ReactNode
+  | ((props: DynMenuTriggerRenderProps) => React.ReactNode);
+
 export interface DynMenuProps {
   /**
    * Menu items
@@ -21,9 +32,9 @@ export interface DynMenuProps {
   items: MenuItem[];
   
   /**
-   * Menu trigger element
+   * Menu trigger element or render function
    */
-  trigger: React.ReactNode;
+  trigger: DynMenuTrigger;
   
   /**
    * Menu placement
@@ -178,16 +189,28 @@ export const DynMenu = forwardRef<DynMenuRef, DynMenuProps>((
   return (
     <div className={clsx('dyn-menu', className)} data-testid={dataTestId} {...props}>
       {/* Trigger */}
-      <button
-        ref={triggerRef}
-        type="button"
-        className="dyn-menu__trigger"
-        onClick={handleTriggerClick}
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-      >
-        {trigger}
-      </button>
+      {typeof trigger === 'function' ? (
+        trigger({
+          ref: triggerRef,
+          type: 'button',
+          className: 'dyn-menu__trigger',
+          onClick: handleTriggerClick,
+          'aria-expanded': isOpen,
+          'aria-haspopup': 'menu',
+          isOpen
+        })
+      ) : (
+        <button
+          ref={triggerRef}
+          type="button"
+          className="dyn-menu__trigger"
+          onClick={handleTriggerClick}
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+        >
+          {trigger}
+        </button>
+      )}
       
       {/* Menu dropdown */}
       {isOpen && (

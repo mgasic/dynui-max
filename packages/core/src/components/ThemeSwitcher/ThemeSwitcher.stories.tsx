@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
-import { ThemeSwitcher, type ThemeMode } from './ThemeSwitcher';
+import { useEffect, useState } from 'react';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import type { ThemeMode } from './ThemeSwitcher';
 import { ThemeProvider } from '../../theme';
 import { DynBox } from '../DynBox/DynBox';
 import { DynContainer } from '../DynContainer/DynContainer';
@@ -18,8 +19,7 @@ const meta: Meta<typeof ThemeSwitcher> = {
 **ThemeSwitcher** provides seamless light/dark theme switching with multiple visual variants and sizes.
 
 ### Features:
-- Light and dark theme switching
-- Optional system preference mode
+- Light, dark, and system theme switching
 - Button, toggle, and dropdown variants
 - Size variants using design tokens
 - Theme context integration
@@ -61,22 +61,27 @@ const meta: Meta<typeof ThemeSwitcher> = {
       control: 'boolean',
       description: 'Display theme labels alongside icons'
     },
+    showSystem: {
+      control: 'boolean',
+      description: 'Include a third state that follows the system preference'
+    },
     mode: {
       control: { type: 'select' },
       options: ['light', 'dark', 'system'],
-      description: 'Controlled theme mode (leave undefined for uncontrolled)'
+      description: 'Controlled theme mode'
     },
-    showSystem: {
-      control: 'boolean',
-      description: 'Expose the system preference option'
+    defaultMode: {
+      control: { type: 'select' },
+      options: ['light', 'dark', 'system'],
+      description: 'Initial mode when using the component uncontrolled'
+    },
+    onModeChange: {
+      action: 'mode-change',
+      description: 'Fires when the theme mode changes'
     },
     disabled: {
       control: 'boolean',
-      description: 'Disable interaction with the switcher'
-    },
-    onChange: {
-      action: 'mode-change',
-      description: 'Callback fired when the theme mode changes'
+      description: 'Disable interactions'
     }
   }
 };
@@ -114,6 +119,98 @@ export const WithLabels: Story = {
     size: 'md',
     variant: 'button',
     showLabels: true
+  }
+};
+
+/**
+ * Controlled example showcasing light/dark/system modes.
+ */
+export const ControlledModes: Story = {
+  render: () => {
+    const getSystemPreference = () =>
+      typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+
+    const [mode, setMode] = useState<ThemeMode>('system');
+    const [systemPreference, setSystemPreference] = useState<'light' | 'dark'>(() => getSystemPreference());
+
+    useEffect(() => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const updatePreference = (event: MediaQueryList | MediaQueryListEvent) => {
+        const matches = 'matches' in event ? event.matches : (event as MediaQueryList).matches;
+        setSystemPreference(matches ? 'dark' : 'light');
+      };
+
+      updatePreference(mediaQuery);
+
+      const listener = (event: MediaQueryListEvent) => updatePreference(event);
+
+      if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', listener);
+        return () => mediaQuery.removeEventListener('change', listener);
+      }
+
+      mediaQuery.addListener(listener);
+      return () => mediaQuery.removeListener(listener);
+    }, []);
+
+    const effectiveTheme = mode === 'system' ? systemPreference : mode;
+    const modeLabel = mode === 'system'
+      ? `Following system preference (${systemPreference})`
+      : `Forced ${mode} mode`;
+
+    return (
+      <DynBox display="flex" direction="column" gap="lg" p="md">
+        <DynBox
+          display="flex"
+          justify="space-between"
+          align="center"
+          p="md"
+          bg="background"
+          radius="md"
+          style={{ border: '1px solid var(--dyn-color-border-primary)' }}
+        >
+          <div>
+            <p style={{ margin: 0, fontWeight: 600 }}>Controlled theme mode</p>
+            <p style={{ margin: '4px 0 0', color: 'var(--dyn-color-text-secondary)' }}>{modeLabel}</p>
+            <p style={{ margin: '4px 0 0', color: 'var(--dyn-color-text-secondary)' }}>
+              Effective theme applied: <strong>{effectiveTheme}</strong>
+            </p>
+          </div>
+          <ThemeSwitcher showSystem mode={mode} onModeChange={setMode} />
+        </DynBox>
+
+        <DynBox display="flex" gap="sm" wrap="wrap">
+          <DynButton variant="solid" color="primary" onClick={() => setMode('light')}>
+            Force light
+          </DynButton>
+          <DynButton variant="solid" color="secondary" onClick={() => setMode('dark')}>
+            Force dark
+          </DynButton>
+          <DynButton variant="outline" onClick={() => setMode('system')}>
+            Follow system
+          </DynButton>
+        </DynBox>
+
+        <DynBox display="flex" gap="lg" wrap="wrap">
+          <ThemeSwitcher variant="button" showLabels showSystem mode={mode} onModeChange={setMode} />
+          <ThemeSwitcher variant="toggle" showSystem mode={mode} onModeChange={setMode} />
+          <ThemeSwitcher variant="dropdown" showLabels showSystem mode={mode} onModeChange={setMode} />
+        </DynBox>
+      </DynBox>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Demonstrates the controlled API with the optional system mode and multiple synchronized switchers.'
+      }
+    }
   }
 };
 
@@ -316,7 +413,7 @@ export const InContext: Story = {
               </DynFieldContainer>
               
               <DynBox display="flex" justify="space-between" align="center" pt="md">
-                <DynButton variant="primary">Submit</DynButton>
+                <DynButton variant="solid" color="primary">Submit</DynButton>
                 <ThemeSwitcher variant="dropdown" size="sm" showLabels />
               </DynBox>
             </DynBox>
@@ -340,33 +437,68 @@ export const InContext: Story = {
  */
 export const CustomImplementation: Story = {
   render: () => {
-    const [currentTheme, setCurrentTheme] = useState('light');
-    
+    const getSystemPreference = () =>
+      typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+
+    const [mode, setMode] = useState<ThemeMode>('system');
+    const [systemPreference, setSystemPreference] = useState<'light' | 'dark'>(() => getSystemPreference());
+
+    useEffect(() => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const updatePreference = (event: MediaQueryList | MediaQueryListEvent) => {
+        const matches = 'matches' in event ? event.matches : (event as MediaQueryList).matches;
+        setSystemPreference(matches ? 'dark' : 'light');
+      };
+
+      updatePreference(mediaQuery);
+
+      const listener = (event: MediaQueryListEvent) => updatePreference(event);
+
+      if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', listener);
+        return () => mediaQuery.removeEventListener('change', listener);
+      }
+
+      mediaQuery.addListener(listener);
+      return () => mediaQuery.removeListener(listener);
+    }, []);
+
+    const effectiveTheme = mode === 'system' ? systemPreference : mode;
+    const modeDescription = mode === 'system'
+      ? `System preference (${systemPreference})`
+      : `Manual ${mode} mode`;
+
     return (
-      <ThemeProvider defaultTheme={currentTheme as 'light' | 'dark'}>
+      <ThemeProvider defaultTheme={effectiveTheme}>
         <DynBox display="flex" direction="column" gap="xl" p="lg">
           <DynBox>
             <h3 style={{ color: 'var(--dyn-color-text-primary)' }}>Custom Theme Management</h3>
             <p style={{ color: 'var(--dyn-color-text-secondary)' }}>
-              This example shows how to integrate ThemeSwitcher with custom state management.
-              Current theme: <strong>{currentTheme}</strong>
+              This example shows how to integrate ThemeSwitcher with controlled state and shared mode selection.
+              Active mode: <strong>{modeDescription}</strong>
             </p>
           </DynBox>
-          
+
           <DynBox display="flex" direction="column" gap="lg">
             <DynBox display="flex" align="center" gap="lg" wrap="wrap">
-              <ThemeSwitcher variant="button" showLabels />
-              <ThemeSwitcher variant="toggle" />
-              <ThemeSwitcher variant="dropdown" showLabels />
+              <ThemeSwitcher variant="button" showLabels showSystem mode={mode} onModeChange={setMode} />
+              <ThemeSwitcher variant="toggle" showSystem mode={mode} onModeChange={setMode} />
+              <ThemeSwitcher variant="dropdown" showLabels showSystem mode={mode} onModeChange={setMode} />
             </DynBox>
-            
-            <DynBox 
-              p="lg" 
-              bg="primary" 
-              color="white" 
+
+            <DynBox
+              p="lg"
+              bg="primary"
+              color="white"
               radius="md"
-              display="flex" 
-              justify="space-between" 
+              display="flex"
+              justify="space-between"
               align="center"
             >
               <div>
@@ -375,20 +507,20 @@ export const CustomImplementation: Story = {
                   This component automatically updates its appearance based on the current theme.
                 </p>
               </div>
-              <ThemeSwitcher variant="toggle" size="lg" />
+              <ThemeSwitcher variant="toggle" size="lg" showSystem mode={mode} onModeChange={setMode} />
             </DynBox>
-            
-            <DynBox 
-              p="lg" 
-              bg="background" 
-              radius="md" 
+
+            <DynBox
+              p="lg"
+              bg="background"
+              radius="md"
               style={{ border: '2px solid var(--dyn-color-border-primary)' }}
             >
               <DynBox display="flex" justify="space-between" align="center" mb="md">
                 <h4 style={{ margin: 0, color: 'var(--dyn-color-text-primary)' }}>Settings Panel</h4>
-                <ThemeSwitcher variant="button" size="sm" />
+                <ThemeSwitcher variant="button" size="sm" showSystem mode={mode} onModeChange={setMode} />
               </DynBox>
-              
+
               <p style={{ margin: 0, color: 'var(--dyn-color-text-secondary)' }}>
                 Theme switching affects all design tokens including colors, shadows, and borders.
                 Try switching themes to see the visual changes throughout the interface.

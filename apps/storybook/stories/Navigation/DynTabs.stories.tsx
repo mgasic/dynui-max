@@ -198,16 +198,18 @@ export const ControlledTabs: Story = {
         <DynBox mb="md">
           <strong>External Controls:</strong>
           <DynBox display="flex" gap="sm" mt="sm">
-            <DynButton 
-              size="sm" 
-              variant={activeTab === 'tab1' ? 'primary' : 'outline'}
+            <DynButton
+              size="sm"
+              variant={activeTab === 'tab1' ? 'solid' : 'outline'}
+              color="primary"
               onClick={() => setActiveTab('tab1')}
             >
               Go to Tab 1
             </DynButton>
-            <DynButton 
+            <DynButton
               size="sm"
-              variant={activeTab === 'tab2' ? 'primary' : 'outline'}
+              variant={activeTab === 'tab2' ? 'solid' : 'outline'}
+              color="primary"
               onClick={() => setActiveTab('tab2')}
             >
               Go to Tab 2

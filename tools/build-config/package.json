@@ -3,12 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "index.js",
-  "files": ["index.js"],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
   "exports": {
     ".": {
-      "import": "./index.js",
-      "require": "./index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
+  },
+  "scripts": {
+    "build": "pnpm clean && tsup index.ts --format esm,cjs --dts --sourcemap --splitting false --out-dir dist --tsconfig tsconfig.json",
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
+  },
+  "devDependencies": {
+    "rimraf": "catalog:tooling",
+    "tsup": "catalog:build",
+    "typescript": "catalog:typescript"
   }
 }
