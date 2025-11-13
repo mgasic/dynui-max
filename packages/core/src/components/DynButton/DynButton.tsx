@@ -73,6 +73,11 @@ const DynButtonComponent = <C extends React.ElementType = 'button'>(
   const isDisabled = disabled || loading;
   const isButtonElement = Component === 'button';
 
+  const forwardedProps = {
+    ...props,
+    disabled: isButtonElement ? undefined : isDisabled || undefined
+  };
+
   const classes = clsx(
     'dyn-button',
     `dyn-button--variant-${variant}`,
@@ -93,7 +98,7 @@ const DynButtonComponent = <C extends React.ElementType = 'button'>(
       disabled={isButtonElement ? isDisabled : undefined}
       aria-busy={loading}
       aria-disabled={!isButtonElement && isDisabled ? true : undefined}
-      {...props}
+      {...forwardedProps}
     >
       {/* Loading spinner */}
       {loading && (

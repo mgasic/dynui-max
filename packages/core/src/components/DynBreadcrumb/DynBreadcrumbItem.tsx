@@ -108,7 +108,12 @@ const DynBreadcrumbItemComponent = <C extends React.ElementType = 'span'>(
   }
 
   return (
-    <Component {...commonProps}>
+    <Component
+      {...commonProps}
+      href={disabled ? undefined : href}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled || undefined}
+    >
       {children}
     </Component>
   );
