@@ -205,7 +205,7 @@ describe('DynStepper', () => {
         <DynStepper current={1} steps={sampleSteps} />
       );
 
-      await expect(axe(container)).toHaveNoViolations();
+      await expect(axe(container)).resolves.toHaveNoViolations();
     });
   });
 });
