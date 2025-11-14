@@ -422,7 +422,7 @@ export const ThemeSwitcher = forwardRef<HTMLButtonElement, ThemeSwitcherProps>(
 
           if (event.key === ' ' || event.key === 'Space' || event.key === 'Spacebar' || event.key === 'Enter') {
             event.preventDefault();
-            keyboardClickPreventedRef.current = false;
+            keyboardClickPreventedRef.current = true;
             changeMode(nextMode);
           }
         }}
