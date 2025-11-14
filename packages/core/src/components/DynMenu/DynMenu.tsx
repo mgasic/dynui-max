@@ -170,7 +170,7 @@ export const DynMenu = forwardRef<DynMenuRef, DynMenuProps>((
     }
   }, [isOpen, enabledItems, focusedIndex, handleItemSelect, handleOpenChange]);
   
-  useEffect((): void => {
+  useEffect(() => {
     if (!isOpen) {
       return;
     }
