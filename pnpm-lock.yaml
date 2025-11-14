@@ -154,7 +154,9 @@ catalogs:
       version: 0.26.11
 
 overrides:
-  typescript: catalog:typescript
+  typescript:
+    specifier: catalog:typescript
+    version: 5.9.3
   source-map: ^0.7.6
 
 importers:
