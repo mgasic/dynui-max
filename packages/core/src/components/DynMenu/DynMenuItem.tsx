@@ -70,22 +70,23 @@ export interface DynMenuItemProps {
  * - Disabled state
  */
 export const DynMenuItem = forwardRef<HTMLButtonElement | HTMLDivElement, DynMenuItemProps>(
-  {
-    children,
-    value,
-    onClick,
-    disabled = false,
-    selected = false,
-    icon,
-    description,
-    shortcut,
-    divider = false,
-    className,
-    'data-testid': dataTestId,
-    ...props
-  },
-  ref
-) => {
+  (
+    {
+      children,
+      value,
+      onClick,
+      disabled = false,
+      selected = false,
+      icon,
+      description,
+      shortcut,
+      divider = false,
+      className,
+      'data-testid': dataTestId,
+      ...props
+    },
+    ref
+  ) => {
   // Divider variant
   if (divider) {
     return (
