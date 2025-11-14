@@ -131,15 +131,13 @@ export const DynMenu = forwardRef<DynMenuRef, DynMenuProps>((
   });
   
   // Keyboard navigation
-  const handleKeyDown = useCallback((event: KeyboardEvent): void => {
-    if (!isOpen) {
-      return;
-    }
-
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (!isOpen) return;
+    
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        setFocusedIndex(prev =>
+        setFocusedIndex(prev => 
           prev < enabledItems.length - 1 ? prev + 1 : 0
         );
         break;
@@ -155,14 +153,10 @@ export const DynMenu = forwardRef<DynMenuRef, DynMenuProps>((
       case ' ':
         event.preventDefault();
         if (focusedIndex >= 0 && focusedIndex < enabledItems.length) {
-          const focusedItem = enabledItems[focusedIndex];
-
-          if (focusedItem) {
-            handleItemSelect(focusedItem.value);
-          }
+          handleItemSelect(enabledItems[focusedIndex].value);
         }
         break;
-
+        
       case 'Escape':
         handleOpenChange(false);
         triggerRef.current?.focus();
@@ -170,16 +164,11 @@ export const DynMenu = forwardRef<DynMenuRef, DynMenuProps>((
     }
   }, [isOpen, enabledItems, focusedIndex, handleItemSelect, handleOpenChange]);
   
-  useEffect((): void => {
-    if (!isOpen) {
-      return;
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
     }
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
   }, [isOpen, handleKeyDown]);
   
   // Reset focused index when menu closes
