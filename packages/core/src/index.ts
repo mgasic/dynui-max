@@ -40,7 +40,7 @@ export type { DynSelectOptionProps } from './components/DynSelect/DynSelectOptio
 export { DynCheckbox } from './components/DynCheckbox';
 export type { DynCheckboxProps } from './components/DynCheckbox';
 
-export { DynRadio, DynRadioGroup } from './components/DynRadio';
+export { DynRadio, DynRadioGroup, useRadioGroupContext } from './components/DynRadio';
 export type { DynRadioProps, DynRadioGroupProps } from './components/DynRadio';
 
 export { DynLabel } from './components/DynLabel';
