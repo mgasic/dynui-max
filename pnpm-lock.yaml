@@ -154,7 +154,9 @@ catalogs:
       version: 0.26.11
 
 overrides:
-  typescript: ^5.6.3
+  typescript:
+    specifier: catalog:typescript
+    version: 5.9.3
   source-map: ^0.7.6
 
 importers:
@@ -232,7 +234,7 @@ importers:
         specifier: catalog:storybook
         version: 11.29.0
       concurrently:
-        specifier: ^8.2.2
+        specifier: catalog:tooling
         version: 8.2.2
       del-cli:
         specifier: catalog:tooling
@@ -277,7 +279,7 @@ importers:
         specifier: catalog:build
         version: 8.5.0(@swc/core@1.15.1)(postcss@8.5.6)(typescript@5.9.3)(yaml@2.8.1)
       typescript:
-        specifier: ^5.6.3
+        specifier: catalog:typescript
         version: 5.9.3
       vite:
         specifier: catalog:build
