@@ -47,7 +47,7 @@ const DynBreadcrumbItemComponent = <C extends React.ElementType = 'span'>(
     disabled = false,
     className,
     as,
-    ...props
+    ...restProps
   }: DynBreadcrumbItemProps<C>,
   ref: React.ComponentPropsWithRef<C>['ref']
 ) => {
@@ -72,7 +72,7 @@ const DynBreadcrumbItemComponent = <C extends React.ElementType = 'span'>(
     className: classes,
     'aria-current': current ? 'page' : undefined,
     'aria-disabled': disabled || undefined,
-    ...props
+    ...restProps
   };
 
   if (isLink) {
@@ -107,13 +107,23 @@ const DynBreadcrumbItemComponent = <C extends React.ElementType = 'span'>(
     );
   }
 
+  const customComponentProps = {
+    ...commonProps,
+    ...(href !== undefined
+      ? {
+          href: disabled ? undefined : href
+        }
+      : null),
+    ...(onClick
+      ? {
+          onClick: disabled ? undefined : onClick
+        }
+      : null),
+    disabled: disabled || undefined
+  };
+
   return (
-    <Component
-      {...commonProps}
-      href={disabled ? undefined : href}
-      onClick={disabled ? undefined : onClick}
-      disabled={disabled || undefined}
-    >
+    <Component {...customComponentProps}>
       {children}
     </Component>
   );

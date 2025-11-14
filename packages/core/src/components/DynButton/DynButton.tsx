@@ -65,7 +65,7 @@ const DynButtonComponent = <C extends React.ElementType = 'button'>(
     as,
     className,
     children,
-    ...props
+    ...restProps
   }: DynButtonProps<C>,
   ref: React.ComponentPropsWithRef<C>['ref']
 ) => {
@@ -74,8 +74,12 @@ const DynButtonComponent = <C extends React.ElementType = 'button'>(
   const isButtonElement = Component === 'button';
 
   const forwardedProps = {
-    ...props,
-    disabled: isButtonElement ? undefined : isDisabled || undefined
+    ...restProps,
+    ...(isButtonElement
+      ? null
+      : {
+          disabled: isDisabled ? true : undefined
+        })
   };
 
   const classes = clsx(
